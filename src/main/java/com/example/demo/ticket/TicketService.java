@@ -4,6 +4,7 @@ import com.example.demo.ticket.domain.TicketRepository;
 import com.example.demo.ticket.domain.TicketVO;
 import com.example.demo.ticket.dto.TicketDto;
 import com.example.demo.ticket.dto.TicketStatusDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TicketService {
 
     @Autowired
@@ -54,4 +56,9 @@ public class TicketService {
         TicketVO newVo = ticketRepository.save(byId.get());
         return new TicketDto(newVo.getId(), newVo.getStatus(), newVo.getMessage());
     }
+
+    public void logMessage(String msg){
+        log.warn("Message: {}", msg);
+    }
+
 }

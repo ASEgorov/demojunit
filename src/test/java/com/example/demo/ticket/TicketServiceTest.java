@@ -1,12 +1,18 @@
 package com.example.demo.ticket;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.example.demo.ticket.domain.TicketRepository;
 import com.example.demo.ticket.domain.TicketVO;
 import com.example.demo.ticket.dto.TicketDto;
 import com.example.demo.ticket.dto.TicketStatusDto;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -29,6 +35,24 @@ public class TicketServiceTest {
 
     @Autowired
     TicketRepository ticketRepository;
+
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
+
+
+    @Before
+    public void initAppender(){
+        logger = (Logger) LoggerFactory.getLogger(TicketService.class);
+        listAppender = new ListAppender<>();
+        logger.addAppender(listAppender);
+        listAppender.start();
+    }
+
+    @After
+    public void stopAppender(){
+        listAppender.stop();
+        listAppender.list.clear();
+    }
 
     /**
      * Проверяем что хороший тикет корректно создается
@@ -139,5 +163,16 @@ public class TicketServiceTest {
 
         List<TicketDto> all = ticketService.getAll();
         assertEquals(2, all.size());
+    }
+
+    @Test
+    public void log(){
+
+        ticketService.logMessage("test");
+
+        assertEquals(1, listAppender.list.size());
+
+        assertEquals(Level.WARN, listAppender.list.get(0).getLevel());
+
     }
 }
